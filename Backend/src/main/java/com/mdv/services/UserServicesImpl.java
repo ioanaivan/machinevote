@@ -18,19 +18,15 @@ public class UserServicesImpl implements UserService {
 
 	private static Logger log = LoggerFactory.getLogger(UserService.class);
 	
-	public User createUser(User user) {
+	public UserIdentifier createUser(User user) {
 		log.info("User creation for user: " + user.getFirstName() + "name : " + user.getName());
 		
-		generateId(user);
+		UserIdentifier userIdent = new UserIdentifierImpl();
+		String idGen = userIdent.generateId();
+		String codeGen = userIdent.generateCode();
+		user.setId(idGen);
+		// TODO setCode when DB ready
 		userJDBC.createUser(user);
-		return user;
+		return userIdent;
 	}
-
-	private User generateId(User user) {
-		user.setId(UUID.randomUUID().toString());
-		log.info("Id generated for user: " + user.getFirstName() + "name : " + user.getName() + " id " + user.getId());
-		return user;
-	}
-	
-	
 }

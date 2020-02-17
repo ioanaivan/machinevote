@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mdv.model.User;
+import com.mdv.services.UserIdentifier;
+import com.mdv.services.UserIdentifierImpl;
 import com.mdv.services.UserService;
 
 @RestController
@@ -25,7 +27,7 @@ public class UserRESTController {
 	private  UserService  userService;
 	
     @PostMapping("/createUser")
-    User createUser(@RequestBody User user) {
+    UserIdentifier createUser(@RequestBody User user) {
     	log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
     	return userService.createUser(user);
     }

@@ -1,12 +1,26 @@
 package com.mdv.model;
 
+import java.util.UUID;
+
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
+import org.passay.CharacterData;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.mdv.services.UserService;
+
 public class User {
 	private String id;
+	private String code;
 	private String firstName;
 	private String name;
 	private String location;
 	private String nationalCardId;
 	private String securityCardId;
+	
 	
 	public String getFirstName() {
 		return firstName;
@@ -44,4 +58,11 @@ public class User {
 	public void setId(String id) {
 		this.id = id;
 	}
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
 }
