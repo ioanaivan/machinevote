@@ -1,0 +1,219 @@
+<template>
+  <div class="container">
+    <!-- Titre + description -->
+      <h1>Machine de vote</h1>
+      <h2>Enregistrement</h2>
+
+    <!--Le nom, prénom et commune peuvent contenir que des lettres majuscules, minuscules, 
+    espace ou guillemet simple de 3 à 24 caractères. -->
+    <h3>Nom :</h3>
+    <div class="row">
+      <div class="col">
+        <input 
+          type="text" 
+          class="large-input mx-auto d-block" 
+          placeholder="Nom"
+          v-model="name" 
+          size="200" 
+          pattern="[A-z,' ', ''']{3,24}"
+        >
+      </div>
+    </div>
+
+    <h3>Prénom :</h3>
+    <div class="row">
+      <div class="col">
+        <input 
+          type="text" 
+          placeholder="Prénom" 
+          v-model="firstName"
+          class="large-input mx-auto d-block"
+          pattern="[A-z,' ', ''']{3,24}"
+        >
+      </div>
+    </div>
+
+    <h3>Commune :</h3>
+    <div class="row">
+      <div class="col">
+        <input 
+          type="text" 
+          placeholder="Commune" 
+          v-model="location"
+          class="large-input mx-auto d-block"
+          pattern="[A-z,' ', ''']{3,24}"
+        >
+      </div>
+    </div>   
+
+        <h3>Numéro de carte d'identité :</h3>
+        <center><h4>5 chiffres</h4></center>
+    <div class="row">
+      <div class="col">
+        <input 
+          type="text" 
+          placeholder="CNI" 
+          v-model="nationalCardId"
+          inputmode="numeric" 
+          minlength="5"
+          maxlength="5" 
+          required autocomplete="off"
+          class="large-input mx-auto d-block"
+        >
+      </div>
+    </div>
+
+          <h3>Numéro de sécurité sociale  :</h3>
+          <center><h4>4 chiffres</h4></center>
+    <div class="row">
+      <div class="col">
+        <input 
+          type="text" 
+          placeholder="sécurité sociale" 
+          v-model="securityCardId"
+          inputmode="numeric" 
+          minlength="4"
+          maxlength="4" 
+          required autocomplete="off"
+          class="large-input mx-auto d-block"
+        >
+      </div>
+    </div>
+
+    <!-- VoteMachine option -->
+    <div class="row justify-content-center"></div>
+
+
+    <!-- Button Action -->
+    <!-- Directive v-bind avec enregistrementVoteAnnule() -->
+    <div class="row">
+      <div class="col">
+        <!-- Tant que les champs ne sont pas remplis, le bouton "valider" n'est pas actif -->
+        <!-- clic bouton : appeler méthode `enregistrementVote` -->
+        <button
+          type="button"
+          class="validate-button btn-lg btn-primary mx-auto d-block"
+          v-on:click="enregistrementVote"
+          :disabled="enregistrementVoteAnnule()"
+        >Valider</button>
+      </div>
+    </div>
+
+    <div class="alert alert-primary" role="alert">
+      <h4 class="alert-heading">Footer : Test</h4>
+      <hr>
+      <p>
+        Nom:
+        <strong>
+          <!-- Moustache avec nom -->
+          <strong>{{ name }}</strong>
+        </strong>
+      </p>
+      <!-- Moustache avec numéro de sécu -->
+      <p>Trace: {{ this.securityCardId }}</p>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import ReponseEnregistrement from "@/components/ReponseEnregistrement.vue";
+import Accueil from "@/components/Accueil.vue";
+export default {
+  name: "EnregistrementVoteMachine",
+  components:{ReponseEnregistrement},
+  data() {
+    return {
+      name : "",
+      firstName: "",
+      location: "",
+      nationalCardId: "",
+      securityCardId: "",
+      erreurDonnee: ""
+    };
+  },
+  
+  methods: {    
+    // crée la fiche de la personne et appelle le service web côté serveur -->
+    enregistrementVote:function() {
+      var personneEnregistreVote = {
+        name: this.name,
+        firstName: this.firstName,
+        location: this.location,
+        nationalCardId: this.nationalCardId,
+        securityCardId: this.securityCardId,
+      };
+      // Test avant post
+      console.log('avant post');
+      axios({
+      method: 'post',
+      baseURL: 'http://10.8.0.1:3002/mdv-backend/createUser',
+      data : personneEnregistreVote,
+      headers: {
+      'Access-Control-Allow-Origin' : 'http://10.8.0.1:3001/123'
+      }
+      })
+      // Traiter la suite une fois la réponse obtenue
+      .then(function(reponse) { console.log(reponse);
+      })
+      // Traiter les erreurs éventuellement survenues
+      .catch( function(erreur) {console.log(erreur);
+      });
+        // Test après post
+       console.log('apres post');
+      if (this.name === "aaa") {
+            this.$router.push({
+            name: "ReponseEnregistrement",
+            params: { pathurl: 456 }
+          });
+      } else {
+        this.$router.push({
+        name: "Accueil",
+        params: { pathurl: 123 }
+          });
+      }
+    },
+      // La fiche est créée si toutes les champs sont informés
+    enregistrementVoteAnnule() {
+    return (
+      this.name === "" ||
+      this.firstName ==="" ||
+      this.location === ""||
+      this.nationalCardId === ""||
+      this.securityCardId === ""
+      );
+    },
+    
+   }
+}
+
+</script>
+
+<style>
+
+.large-input {
+  box-sizing: border-box;
+  width: 500px;
+  max-width: 80%;
+  border-radius: 7px;
+  border: 1px solid #bdc3c7;
+  padding: 10px 20px;
+  outline: none;
+  text-align: center;
+  line-height: 30px;
+  font-size: 15px;
+  margin: 20px;
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.clear-button {
+  margin-bottom: 25px;
+}
+
+.error-message {
+  font-size: 125%;
+  font-weight: bold;
+}
+</style>
