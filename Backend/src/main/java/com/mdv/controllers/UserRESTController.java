@@ -1,5 +1,10 @@
 package com.mdv.controllers;
 
+import org.springframework.validation.BindingResult;
+import java.lang.Exception;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +22,39 @@ import com.mdv.model.User;
 import com.mdv.services.UserIdentifier;
 import com.mdv.services.UserIdentifierImpl;
 import com.mdv.services.UserService;
+import com.mdv.repository.UserServiceJDBCTemplate;
 
 @RestController
 public class UserRESTController {
+	
+	BindingResult result;
 	
 	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
 	
 	@Autowired
 	private  UserService  userService;
 	
+	@Autowired
+	private UserServiceJDBCTemplate userJDBC ;
+	
     @PostMapping("/createUser")
     UserIdentifier createUser(@RequestBody User user) {
-    	log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
-    	return userService.createUser(user);
+    	
+    	//Search for the given Nom and Prenom.
+    	User exist = userJDBC.findByFirstNameAndName(user.getFirstName(), user.getName());
+    	
+    	//Reject the registration if Nom and Prenom exist.
+   		 if (exist != null) {
+   			 result.reject("Utilisateur existe");
+   		 }
+   		 
+   	//Create the User if else.
+   		 else
+   	        log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
+            return userService.createUser(user);
     }
+
+    	
     
     @GetMapping(value="/test", produces="text/plain")
     String test() {
@@ -38,3 +62,4 @@ public class UserRESTController {
     	return "{\"success\":1}";
     }
 }
+
