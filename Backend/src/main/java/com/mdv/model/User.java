@@ -1,6 +1,7 @@
 package com.mdv.model;
 
 import java.util.UUID;
+import java.sql.Timestamp;
 
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
@@ -20,6 +21,9 @@ public class User {
 	private String location;
 	private String nationalCardId;
 	private String securityCardId;
+	
+	//When the User is creating is account.
+	private Timestamp joinedAt;
 	
 	
 	public String getFirstName() {
@@ -63,6 +67,14 @@ public class User {
 	}
 	public void setCode(String code) {
 		this.code = code;
+	}
+	
+	public Timestamp getJoinedAt() {
+		return joinedAt;
+	}
+	
+	public void setJoinedAt(Timestamp joinedAt) {
+		this.joinedAt = joinedAt;
 	}
 	
 }

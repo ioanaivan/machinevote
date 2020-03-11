@@ -13,8 +13,10 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.sql.Timestamp;
 
 import com.mdv.model.*;
+import com.mdv.services.UserRowMapper;
 
 @Transactional
 @Repository
@@ -32,8 +34,8 @@ public class UserServiceJDBCTemplate {
     public User createUser(User newUser) {
     	log.debug("JDBC call for user creation ID: " + newUser.getId() + " firstname " + newUser.getFirstName() + " name : " + newUser.getName());
     	
-    	jdbcTemplate.update("INSERT INTO mdv.electeur(idelecteur, nom, prenom, commune, carteid, secuid) VALUES (?, ?, ?, ?, ?, ?)",
-          new Object[] { newUser.getId(), newUser.getName(), newUser.getFirstName(), newUser.getLocation(), newUser.getNationalCardId(), newUser.getSecurityCardId() });   
+    	jdbcTemplate.update("INSERT INTO mdv.electeur(idelecteur, nom, prenom, commune, carteid, secuid, code) VALUES (?, ?, ?, ?, ?, ?)",
+          new Object[] { newUser.getId(), newUser.getName(), newUser.getFirstName(), newUser.getLocation(), newUser.getNationalCardId(), newUser.getSecurityCardId(), newUser.getCode() });   
       
     	return newUser;    
     }
@@ -62,4 +64,15 @@ public class UserServiceJDBCTemplate {
           new Object[] {user.getName(), user.getFirstName(), user.getLocation(), user.getNationalCardId(), user.getSecurityCardId(), user.getId()});
       return user;   
     }
+    
+
+    //Find a User by its Nom and Prenom.
+    public User findByFirstNameAndName(String fname, String name) {
+
+    	String sql = "SELECT * FROM electeur WHERE Prenom = ? AND Nom = ?"; 
+    	User user = jdbcTemplate.queryForObject(sql, new Object[] {fname , name}, new UserRowMapper());
+
+        return user;
+    	
+    }   
 }

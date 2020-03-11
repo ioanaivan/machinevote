@@ -1,5 +1,10 @@
 package com.mdv.controllers;
 
+import org.springframework.validation.BindingResult;
+import java.lang.Exception;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +23,23 @@ import com.mdv.model.User;
 import com.mdv.services.UserIdentifier;
 import com.mdv.services.UserIdentifierImpl;
 import com.mdv.services.UserService;
+import com.mdv.repository.UserServiceJDBCTemplate;
 
 @RestController
 public class UserRESTController {
 	
-	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
+	BindingResult result;
 	
-	@Autowired
-	private  UserService  userService;
+	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
 	
 	@CrossOrigin
     @PostMapping("/createUser")
     UserIdentifier createUser(@RequestBody User user) {
-    	log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
-    	return userService.createUser(user);
+   	        log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
+            return userService.createUser(user);
     }
+
+    	
     
 	@CrossOrigin
     @GetMapping(value="/test", produces="text/plain")
@@ -41,3 +48,4 @@ public class UserRESTController {
     	return "{\"success\":1}";
     }
 }
+
