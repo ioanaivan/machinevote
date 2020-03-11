@@ -31,12 +31,6 @@ public class UserRESTController {
 	
 	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
 	
-	@Autowired
-	private  UserService  userService;
-	
-	@Autowired
-	private UserServiceJDBCTemplate userJDBC ;
-	
     @PostMapping("/createUser")
     UserIdentifier createUser(@RequestBody User user) {
    	        log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
