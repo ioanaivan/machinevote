@@ -28,7 +28,8 @@ import com.mdv.repository.UserServiceJDBCTemplate;
 @RestController
 public class UserRESTController {
 	
-	BindingResult result;
+	@Autowired
+	public UserService userService;
 	
 	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
 	
@@ -39,8 +40,6 @@ public class UserRESTController {
             return userService.createUser(user);
     }
 
-    	
-    
 	@CrossOrigin
     @GetMapping(value="/test", produces="text/plain")
     String test() {
