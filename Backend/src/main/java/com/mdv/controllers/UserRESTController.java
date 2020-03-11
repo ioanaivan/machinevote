@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +27,14 @@ public class UserRESTController {
 	@Autowired
 	private  UserService  userService;
 	
+	@CrossOrigin
     @PostMapping("/createUser")
     UserIdentifier createUser(@RequestBody User user) {
     	log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
     	return userService.createUser(user);
     }
     
+	@CrossOrigin
     @GetMapping(value="/test", produces="text/plain")
     String test() {
     	log.info("This is an info log entry");
