@@ -39,17 +39,6 @@ public class UserRESTController {
 	
     @PostMapping("/createUser")
     UserIdentifier createUser(@RequestBody User user) {
-    	
-    	//Search for the given Nom and Prenom.
-    	User exist = userJDBC.findByFirstNameAndName(user.getFirstName(), user.getName());
-    	
-    	//Reject the registration if Nom and Prenom exist.
-   		 if (exist != null) {
-   			 result.reject("Utilisateur existe");
-   		 }
-   		 
-   	//Create the User if else.
-   		 else
    	        log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: " + user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId() + " securityCardId: " + user.getSecurityCardId());
             return userService.createUser(user);
     }
