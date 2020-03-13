@@ -34,7 +34,7 @@ public class UserServiceJDBCTemplate {
     public User createUser(User newUser) {
     	log.debug("JDBC call for user creation ID: " + newUser.getId() + " firstname " + newUser.getFirstName() + " name : " + newUser.getName());
     	
-    	jdbcTemplate.update("INSERT INTO mdv.electeur(idelecteur, nom, prenom, commune, carteid, secuid, code) VALUES (?, ?, ?, ?, ?, ?)",
+    	jdbcTemplate.update("INSERT INTO mdv.electeur(idelecteur, nom, prenom, commune, carteid, secuid, code) VALUES (?, ?, ?, ?, ?, ?, ?)",
           new Object[] { newUser.getId(), newUser.getName(), newUser.getFirstName(), newUser.getLocation(), newUser.getNationalCardId(), newUser.getSecurityCardId(), newUser.getCode() });   
       
     	return newUser;    
