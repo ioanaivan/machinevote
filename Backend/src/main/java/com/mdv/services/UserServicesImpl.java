@@ -36,14 +36,7 @@ public class UserServicesImpl implements UserService {
 		user.setId(idGen);
 		user.setCode(codeGen);
 		// TODO setCode when DB ready
-		
-		//Search for the given Nom and Prenom.
-				
-				
-				//Reject the registration if Nom and Prenom exist.
-					 //if (exist != null) {
-						 //result.reject("Utilisateur existe");
-					 //}	
+	
 		userJDBC.createUser(user);
 		return userIdent;
 		}
