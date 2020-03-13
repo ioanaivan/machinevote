@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -66,11 +66,20 @@ public class UserServiceJDBCTemplate {
     }
     
 
-    //Find a User by its Nom and Prenom.
-    public User findByFirstNameAndName(String fname, String name) {
+    //Find a User by its ID Card.
+    public User findByIdCard(String card) {
+    	
+    	User user = null;
 
-    	String sql = "SELECT * FROM electeur WHERE Prenom = ? AND Nom = ?"; 
-    	User user = jdbcTemplate.queryForObject(sql, new Object[] {fname , name}, new UserRowMapper());
+    	String sql = "SELECT * FROM electeur WHERE CarteID = ?";
+    	
+    	try {
+    	     user = jdbcTemplate.queryForObject(sql, new Object[] {card}, new UserRowMapper());
+    	}
+    	catch (EmptyResultDataAccessException e)
+    	{
+    		return null;
+    	}
 
         return user;
     	

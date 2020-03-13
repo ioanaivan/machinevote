@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mdv.model.User;
-import com.mdv.repository.UserServiceJDBCTemplate;
+import com.mdv.model.*;
+import com.mdv.repository.*;
+import com.mdv.services.*;
 
 import org.springframework.validation.BindingResult;
 import java.lang.Exception;
@@ -26,6 +27,9 @@ public class UserServicesImpl implements UserService {
 	public UserIdentifier createUser(User user) {
 		log.info("User creation for user: " + user.getFirstName() + "name : " + user.getName());
 		
+		User exist = userJDBC.findByIdCard(user.getNationalCardId());
+		if (exist == null)
+		{	
 		UserIdentifier userIdent = new UserIdentifierImpl();
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
@@ -34,7 +38,7 @@ public class UserServicesImpl implements UserService {
 		// TODO setCode when DB ready
 		
 		//Search for the given Nom and Prenom.
-				//User exist = userJDBC.findByFirstNameAndName(user.getFirstName(), user.getName());
+				
 				
 				//Reject the registration if Nom and Prenom exist.
 					 //if (exist != null) {
@@ -42,6 +46,9 @@ public class UserServicesImpl implements UserService {
 					 //}	
 		userJDBC.createUser(user);
 		return userIdent;
+		}
+		return null;
 	
 }
 }
+
