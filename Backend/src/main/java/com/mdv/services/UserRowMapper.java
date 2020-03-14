@@ -18,6 +18,7 @@ public class UserRowMapper implements RowMapper<User>{
             user.setId(rs.getString("id")); 
             user.setName(rs.getString("nom")); 
             user.setFirstName(rs.getString("prenom"));
+            user.setId(rs.getString("CarteID")); 
             return user;
 	        
 
