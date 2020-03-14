@@ -27,7 +27,10 @@ public class UserServicesImpl implements UserService {
 	public UserIdentifier createUser(User user) {
 		log.info("User creation for user: " + user.getFirstName() + "name : " + user.getName());
 		
-		User exist = userJDBC.findByIdCard(user.getNationalCardId());
+		//User exist = userJDBC.findByIdCard(user.getNationalCardId());
+		
+		String exist = userJDBC.findByIdCard(user.getNationalCardId());
+		
 		if (exist == null)
 		{	
 		UserIdentifier userIdent = new UserIdentifierImpl();

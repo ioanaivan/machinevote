@@ -67,7 +67,7 @@ public class UserServiceJDBCTemplate {
     
 
     //Find a User by its ID Card.
-    public User findByIdCard(String card) {
+    /*public User findByIdCard(String card) {
     	
     	User user = null;
 
@@ -83,5 +83,22 @@ public class UserServiceJDBCTemplate {
 
         return user;
     	
-    }   
+    }*/
+    
+public String findByIdCard(String card) {
+    	
+    	String nom = null;
+
+    	String sql = "SELECT Nom FROM electeur WHERE CarteID = ?";
+    	
+    	try {
+    	     nom = jdbcTemplate.queryForObject(sql, new Object[] {card}, String.class);
+    	}
+    	catch (EmptyResultDataAccessException e)
+    	{
+    		return null;
+    	}
+
+        return nom;
+}
 }
