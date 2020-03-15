@@ -87,18 +87,18 @@ public class UserServiceJDBCTemplate {
     
 public String findByIdCard(String card) {
     	
-    	String nom = null;
+    	String carte = null;
 
-    	String sql = "SELECT Nom FROM electeur WHERE CarteID = ?";
+    	String sql = "SELECT CarteID FROM electeur WHERE CarteID = ?";
     	
     	try {
-    	     nom = jdbcTemplate.queryForObject(sql, new Object[] {card}, String.class);
+    	     carte = jdbcTemplate.queryForObject(sql, new Object[] {card}, String.class);
     	}
     	catch (EmptyResultDataAccessException e)
     	{
     		return null;
     	}
 
-        return nom;
+        return carte;
 }
 }
