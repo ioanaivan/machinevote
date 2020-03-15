@@ -2,6 +2,8 @@ package com.mdv.services;
 
 import java.util.UUID;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import com.mdv.repository.*;
 import com.mdv.services.*;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.view.RedirectView;
+
 import java.lang.Exception;
 
 @Service
@@ -43,8 +47,10 @@ public class UserServicesImpl implements UserService {
 		userJDBC.createUser(user);
 		return userIdent;
 		}
+
+		javax.swing.JOptionPane.showMessageDialog(null,this, "Numéro de carte d'identité existe déjà",0);
+		new RedirectView("redirectedUrl");
 		return null;
-	
 }
 }
 
