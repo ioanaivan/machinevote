@@ -1,46 +1,40 @@
-package com.mdv.services;
+/*
+ * Class containing services used for processing
+ */
 
-import java.util.UUID;
+package com.mdv.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.mdv.model.User;
-import com.mdv.repository.UserServiceJDBCTemplate;
-
-import org.springframework.validation.BindingResult;
-import java.lang.Exception;
+import com.mdv.model.*;
+import com.mdv.repository.*;
 
 @Service
 public class UserServicesImpl implements UserService {
-	
-	BindingResult result;
-	
+
 	@Autowired
-	private UserServiceJDBCTemplate userJDBC ;
+	private UserServiceJDBCTemplate userJDBC;
 
 	private static Logger log = LoggerFactory.getLogger(UserService.class);
-	
+
 	public UserIdentifier createUser(User user) {
 		log.info("User creation for user: " + user.getFirstName() + "name : " + user.getName());
-		
+
+		// TODO repair method
+		String exist = userJDBC.findByIdCard(user.getNationalCardId());
+		// TODO test exist
+
 		UserIdentifier userIdent = new UserIdentifierImpl();
+
+		// generate user identifier and password before store in DB
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
-		user.setId(idGen);
-		// TODO setCode when DB ready
-		
-		//Search for the given Nom and Prenom.
-				User exist = userJDBC.findByFirstNameAndName(user.getFirstName(), user.getName());
-				
-				//Reject the registration if Nom and Prenom exist.
-					 if (exist != null) {
-						 result.reject("Utilisateur existe");
-					 }	
-		userJDBC.createUser(user);
+		userIdent.setId(idGen);
+		userIdent.setCode(codeGen);
+
+		userJDBC.createUser(user, userIdent);
 		return userIdent;
-	
-}
+	}
 }
