@@ -51,6 +51,12 @@ public class UserServiceJDBCTemplate {
 			return null;
 		}
 
+		if (carte == null) {
+			log.info("User not found");
+		} else {
+			log.info("User found");
+		}
+
 		return carte;
 	}
 }
