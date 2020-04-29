@@ -19,7 +19,6 @@ import com.mdv.exceptions.UserMultipleRecordsException;
 import com.mdv.exceptions.UserNotFoundException;
 import com.mdv.model.*;
 
-
 @Transactional
 @Repository
 public class UserServiceJDBCTemplate {
@@ -90,12 +89,6 @@ public class UserServiceJDBCTemplate {
 
 	public void registerAction(String type, String status, String error, String voterid) {
 		log.info("JDBC call for registering action: " + type + ", intiated by: " + voterid);
-
-		if (carte == null) {
-			log.info("User not found");
-		} else {
-			log.info("User found");
-		}
 
 		jdbcTemplate.update("INSERT INTO mdv.actions(type, statut, erreur, idelecteur) VALUES (?, ?, ?, ?)",
 				new Object[] { type, status, error, voterid });
