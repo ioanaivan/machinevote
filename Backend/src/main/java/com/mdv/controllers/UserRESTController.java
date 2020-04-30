@@ -43,7 +43,6 @@ public class UserRESTController {
 		} catch (UserAlreadyFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already	registered with this ID card", ex);
 		} catch (UserMultipleRecordsException e) {
-			e.printStackTrace();
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Multiple registration found.", e);
 		}
 	}
@@ -57,7 +56,6 @@ public class UserRESTController {
 		} catch (UserNotFoundException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user found for the id and code provided", ex);
 		} catch (UserMultipleRecordsException e) {
-			e.printStackTrace();
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Multiple registration found.", e);
 		}
 	}
