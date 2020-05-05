@@ -7,13 +7,11 @@ package com.mdv.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.mdv.exceptions.UserAlreadyFoundException;
 import com.mdv.exceptions.UserMultipleRecordsException;
@@ -34,30 +32,19 @@ public class UserRESTController {
 
 	@CrossOrigin
 	@PostMapping("/createUser")
-	UserIdentifier createUser(@RequestBody User user) {
+	UserIdentifier createUser(@RequestBody User user) throws UserAlreadyFoundException, UserMultipleRecordsException {
 		log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: "
 				+ user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId()
 				+ " securityCardId: " + user.getSecurityCardId());
-		try {
-			return userService.createUser(user);
-		} catch (UserAlreadyFoundException ex) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already	registered with this ID card", ex);
-		} catch (UserMultipleRecordsException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Multiple registration found.", e);
-		}
+		return userService.createUser(user);
 	}
 
 	@CrossOrigin
 	@PostMapping("/authUser")
-	void authUser(@RequestBody UserIdentifierImpl userIdentifier) {
+	void authUser(@RequestBody UserIdentifierImpl userIdentifier)
+			throws UserNotFoundException, UserMultipleRecordsException {
 		log.info("POST Request to /authUser received with data : " + "id: " + userIdentifier.getId());
-		try {
-			userService.authUser(userIdentifier);
-		} catch (UserNotFoundException ex) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user found for the id and code provided", ex);
-		} catch (UserMultipleRecordsException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Multiple registration found.", e);
-		}
+		userService.authUser(userIdentifier);
 	}
 
 	@CrossOrigin

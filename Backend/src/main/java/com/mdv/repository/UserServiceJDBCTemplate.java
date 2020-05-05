@@ -57,10 +57,12 @@ public class UserServiceJDBCTemplate {
 				throw new UserAlreadyFoundException("User already registered.");
 			}
 		} catch (EmptyResultDataAccessException e) {
-			log.info("User not found in DB");
+			log.info("User not found in DB, can be created");
 		} catch (IncorrectResultSizeDataAccessException ex) {
-			// log.info("User already registered");
+			log.info("User already registered");
 			throw new UserMultipleRecordsException("User already registered. Multiple records found.");
+		} finally {
+			registerAction("Registration", "0", "NULL", card);
 		}
 	}
 

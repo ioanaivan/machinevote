@@ -44,6 +44,7 @@ public class UserServicesImpl implements UserService {
 		userJDBC.createUser(user, userIdent);
 
 		// userJDBC.registerAction("Registration", "0", "NULL", idGen);
+
 		return userIdent;
 	}
 
