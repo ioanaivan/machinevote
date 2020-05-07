@@ -14,6 +14,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
+import com.mdv.exceptions.NoActionFoundException;
 import com.mdv.exceptions.UserAlreadyFoundException;
 import com.mdv.exceptions.UserMultipleRecordsException;
 import com.mdv.exceptions.UserNotFoundException;
@@ -60,14 +61,13 @@ public class UserServiceJDBCTemplate {
 			log.info("User not found in DB, can be created");
 		} catch (IncorrectResultSizeDataAccessException ex) {
 			log.info("User already registered");
+			saveAction("Register", "FAILED", "User already registered. Multiple records found.", "0");
 			throw new UserMultipleRecordsException("User already registered. Multiple records found.");
-		} finally {
-			registerAction("Registration", "0", "NULL", card);
 		}
 	}
 
 	// retrieve data corresponding to IdCard and Secu
-	public void findByIdCardSecuCard(UserIdentifier userIdentifier)
+	public void findByIdentifier(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException {
 		log.info("JDBC call for user authentification ID and code ");
 
@@ -76,29 +76,44 @@ public class UserServiceJDBCTemplate {
 					new Object[] { userIdentifier.getCode(), userIdentifier.getId() }, Integer.class);
 
 		} catch (EmptyResultDataAccessException e) {
+			log.info("Login failed. Pleasetry again.");
+			saveAction("Authenticate", "FAILED", "User not found.", userIdentifier.getId());
 			throw new UserNotFoundException("User not found. Please register.");
 		} catch (IncorrectResultSizeDataAccessException ex) {
+			log.info("Multiple users found.");
+			saveAction("Authenticate", "FAILED", "Multiple users found.", userIdentifier.getId());
 			throw new UserMultipleRecordsException("Multiple records found");
 		}
 	}
 
-	public void registerVote(VoteIdentifier voteIdentifier) {
+	public String getAction(String userId, String action, String type)
+			throws NoActionFoundException, UserMultipleRecordsException {
+		log.info("JDBC call for checking status for action: " + action + ", for userId: " + userId);
+		String actionId = "";
+		try {
+			actionId = jdbcTemplate.queryForObject(
+					"SELECT idAction FROM actions WHERE idElecteur = ? and type = ? and statut = ? LIMIT 1 ",
+					new Object[] { userId, action, type }, String.class);
+
+		} catch (EmptyResultDataAccessException e) {
+			log.info("No records returned for  " + action + " first. " + userId);
+		} catch (IncorrectResultSizeDataAccessException ex) {
+			log.info("Multiple " + action + "s found for this user.");
+		}
+		return actionId;
+	}
+
+	public void createVote(VoteIdentifier voteIdentifier) {
 		log.info("JDBC call for vote for ID: " + voteIdentifier.getId());
 
 		jdbcTemplate.update("INSERT INTO mdv.vote(voterid, optionvote) VALUES (?, ?)",
 				new Object[] { voteIdentifier.getId(), voteIdentifier.getVoteOption() });
 	}
 
-	public void registerAction(String type, String status, String error, String voterid) {
+	public void saveAction(String type, String status, String error, String voterid) {
 		log.info("JDBC call for registering action: " + type + ", intiated by: " + voterid);
 
 		jdbcTemplate.update("INSERT INTO mdv.actions(type, statut, erreur, idelecteur) VALUES (?, ?, ?, ?)",
 				new Object[] { type, status, error, voterid });
-
-	}
-
-	public void isRegistered(UserIdentifier userIdentifier) {
-		// TODO Auto-generated method stub
-
 	}
 }

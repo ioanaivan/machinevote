@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mdv.exceptions.NoActionFoundException;
 import com.mdv.exceptions.UserAlreadyFoundException;
 import com.mdv.exceptions.UserMultipleRecordsException;
 import com.mdv.exceptions.UserNotFoundException;
+import com.mdv.exceptions.VoteAlreadyFoundException;
 import com.mdv.model.*;
 import com.mdv.repository.*;
 
@@ -35,7 +37,7 @@ public class UserServicesImpl implements UserService {
 
 		UserIdentifier userIdent = new UserIdentifierImpl();
 
-		// generate user identifier and password before store in DB
+		// Generate user identifier and password before store in DB
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
 		userIdent.setId(idGen);
@@ -43,24 +45,48 @@ public class UserServicesImpl implements UserService {
 
 		userJDBC.createUser(user, userIdent);
 
-		// userJDBC.registerAction("Registration", "0", "NULL", idGen);
+		// Sucessful registration
+		userJDBC.saveAction("Register", "SUCCESS", "NULL", idGen);
 
 		return userIdent;
 	}
 
 	@Override
-	public void authUser(UserIdentifier userIdentifier) throws UserNotFoundException, UserMultipleRecordsException {
+	public void authUser(UserIdentifier userIdentifier)
+			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException {
 		log.info("User authentification for user id: " + userIdentifier.getId());
-		userJDBC.findByIdCardSecuCard(userIdentifier);
+		userJDBC.findByIdentifier(userIdentifier);
 
-		userJDBC.isRegistered(userIdentifier);
+		// Check authentication condition : successful registration
 
-		// userJDBC.registerAction("Authentification", "0", "NULL", idGen);
+		if (!userJDBC.getAction(userIdentifier.getId(), "Register", "SUCCESS").equals("")) {
+
+			// Successful authentication
+			userJDBC.saveAction("Authenticate", "SUCCESS", "NULL", userIdentifier.getId());
+		} else {
+			log.info("No  registration found for user: " + userIdentifier.getId());
+			userJDBC.saveAction("Authenticate", "FAILED", "No registration found.", userIdentifier.getId());
+			throw new NoActionFoundException("User not registered. Please register first.");
+		}
 	}
 
 	@Override
-	public void registerVote(VoteIdentifier voteIdentifier) {
+	public void createVote(VoteIdentifier voteIdentifier)
+			throws NoActionFoundException, UserMultipleRecordsException, VoteAlreadyFoundException {
 		log.info("Voting for user id: " + voteIdentifier.getId());
-		userJDBC.registerVote(voteIdentifier);
+
+		// Check vote conditions: successful authentication and no previous vote present
+		if (userJDBC.getAction(voteIdentifier.getId(), "Authenticate", "SUCCESS").equals("")) {
+			throw new NoActionFoundException("User not authenticated. Please authenticate first.");
+		} else {
+			if (!userJDBC.getAction(voteIdentifier.getId(), "Vote", "SUCCESS").equals("")) {
+				throw new VoteAlreadyFoundException(
+						"You have already voted. To log a complain, please call customer support.");
+			} else {
+				// Sucessful vote
+				userJDBC.createVote(voteIdentifier);
+				userJDBC.saveAction("Vote", "SUCCESS", "NULL", voteIdentifier.getId());
+			}
+		}
 	}
 }

@@ -35,4 +35,18 @@ public class ExceptionsHandler {
 		ErrorMessage em = new ErrorMessage(ex.getMessage());
 		return new ResponseEntity<ErrorMessage>(em, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(NoActionFoundException.class)
+	ResponseEntity<ErrorMessage> handleNoActionFoundException(NoActionFoundException ex) {
+		log.info("Handling exception : " + ex.getMessage());
+		ErrorMessage em = new ErrorMessage(ex.getMessage());
+		return new ResponseEntity<ErrorMessage>(em, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(VoteAlreadyFoundException.class)
+	ResponseEntity<ErrorMessage> handleVoteAlreadyFoundException(VoteAlreadyFoundException ex) {
+		log.info("Handling exception : " + ex.getMessage());
+		ErrorMessage em = new ErrorMessage(ex.getMessage());
+		return new ResponseEntity<ErrorMessage>(em, HttpStatus.BAD_REQUEST);
+	}
 }

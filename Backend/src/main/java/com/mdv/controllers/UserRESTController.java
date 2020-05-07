@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mdv.exceptions.NoActionFoundException;
 import com.mdv.exceptions.UserAlreadyFoundException;
 import com.mdv.exceptions.UserMultipleRecordsException;
 import com.mdv.exceptions.UserNotFoundException;
+import com.mdv.exceptions.VoteAlreadyFoundException;
 import com.mdv.model.User;
 import com.mdv.model.UserIdentifier;
 import com.mdv.model.UserIdentifierImpl;
@@ -42,16 +44,17 @@ public class UserRESTController {
 	@CrossOrigin
 	@PostMapping("/authUser")
 	void authUser(@RequestBody UserIdentifierImpl userIdentifier)
-			throws UserNotFoundException, UserMultipleRecordsException {
+			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException {
 		log.info("POST Request to /authUser received with data : " + "id: " + userIdentifier.getId());
 		userService.authUser(userIdentifier);
 	}
 
 	@CrossOrigin
 	@PostMapping("/vote")
-	void vote(@RequestBody VoteIdentifier voteIdentifier) {
+	void vote(@RequestBody VoteIdentifier voteIdentifier)
+			throws NoActionFoundException, UserMultipleRecordsException, VoteAlreadyFoundException {
 		log.info("POST Request to /vote received with data : " + "id: " + voteIdentifier.getId());
-		userService.registerVote(voteIdentifier);
+		userService.createVote(voteIdentifier);
 	}
 
 	@CrossOrigin
