@@ -13,8 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mdv.exceptions.UserAlreadyFoundException;
+import com.mdv.exceptions.UserMultipleRecordsException;
+import com.mdv.exceptions.UserNotFoundException;
 import com.mdv.model.User;
 import com.mdv.model.UserIdentifier;
+import com.mdv.model.UserIdentifierImpl;
+import com.mdv.model.VoteIdentifier;
 import com.mdv.services.UserService;
 
 @RestController
@@ -27,7 +32,7 @@ public class UserRESTController {
 
 	@CrossOrigin
 	@PostMapping("/createUser")
-	UserIdentifier createUser(@RequestBody User user) {
+	UserIdentifier createUser(@RequestBody User user) throws UserAlreadyFoundException, UserMultipleRecordsException {
 		log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: "
 				+ user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId()
 				+ " securityCardId: " + user.getSecurityCardId());
@@ -35,9 +40,25 @@ public class UserRESTController {
 	}
 
 	@CrossOrigin
+	@PostMapping("/authUser")
+	void authUser(@RequestBody UserIdentifierImpl userIdentifier)
+			throws UserNotFoundException, UserMultipleRecordsException {
+		log.info("POST Request to /authUser received with data : " + "id: " + userIdentifier.getId());
+		userService.authUser(userIdentifier);
+	}
+
+	@CrossOrigin
+	@PostMapping("/vote")
+	void vote(@RequestBody VoteIdentifier voteIdentifier) {
+		log.info("POST Request to /vote received with data : " + "id: " + voteIdentifier.getId());
+		userService.registerVote(voteIdentifier);
+	}
+
+	@CrossOrigin
 	@GetMapping(value = "/test", produces = "text/plain")
 	String test() {
-		log.info("This is an info log entry");
+		log.info("Test attempt");
 		return "{\"success\":1}";
+
 	}
 }

@@ -34,7 +34,8 @@ public class UserIdentifierImpl implements UserIdentifier {
 	}
 
 	public UserIdentifierImpl() {
-		// TODO Auto-generated constructor stub
+		this.code = "";
+		this.id = "";
 	}
 
 	@Override
