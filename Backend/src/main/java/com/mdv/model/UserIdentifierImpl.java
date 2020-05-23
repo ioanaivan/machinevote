@@ -12,9 +12,6 @@ import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 public class UserIdentifierImpl implements UserIdentifier {
@@ -56,12 +53,6 @@ public class UserIdentifierImpl implements UserIdentifier {
 	public String generateCode() {
 		this.setCode(this.generatePassayCode());
 		return this.getCode();
-	}
-
-	public String enCode(String code) {
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
-		String enCode = encoder.encode(code);
-		return enCode;
 	}
 
 	public String encryptCode(String code) {
