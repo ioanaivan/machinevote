@@ -16,4 +16,9 @@ public interface UserIdentifier {
 	public String getId();
 
 	public String getCode();
+
+	public String encryptCode(String code);
+
+	public String decryptCode(String enCode);
+
 }

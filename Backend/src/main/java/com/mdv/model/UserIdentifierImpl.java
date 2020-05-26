@@ -12,6 +12,7 @@ import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jasypt.util.text.BasicTextEncryptor;
 
 public class UserIdentifierImpl implements UserIdentifier {
 
@@ -19,6 +20,7 @@ public class UserIdentifierImpl implements UserIdentifier {
 
 	private String id;
 	private String code;
+	BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
 
 	public String getId() {
 		return id;
@@ -51,6 +53,17 @@ public class UserIdentifierImpl implements UserIdentifier {
 	public String generateCode() {
 		this.setCode(this.generatePassayCode());
 		return this.getCode();
+	}
+
+	public String encryptCode(String code) {
+		textEncryptor.setPassword(code);
+		String enCode = textEncryptor.encrypt(code);
+		return enCode;
+	}
+
+	public String decryptCode(String code) {
+		String deCode = textEncryptor.decrypt(code);
+		return deCode;
 	}
 
 	// TODO draft method - move to another class

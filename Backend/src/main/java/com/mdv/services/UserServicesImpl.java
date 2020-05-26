@@ -7,6 +7,7 @@ package com.mdv.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.mdv.clients.GovClient;
@@ -43,13 +44,25 @@ public class UserServicesImpl implements UserService {
 		UserIdentifier userIdent = new UserIdentifierImpl();
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
+
+		System.out.println("the code is:" + codeGen);
+
+		// Test the encryption method
+		String enCode = userIdent.encryptCode(codeGen);
+		System.out.println("encrypted code:" + enCode);
+
+		// Test the decryption method
+		String deCode = userIdent.decryptCode(enCode);
+		System.out.println("decrypted code:" + deCode);
+
+		// Create the user with encrypted code
 		userIdent.setId(idGen);
-		userIdent.setCode(codeGen);
+		userIdent.setCode(enCode);
 
 		userJDBC.createUser(user, userIdent);
 
 		// Sucessful registration
-		userJDBC.saveAction("Register", "SUCCESS", "NULL", idGen);
+		userJDBC.saveAction("Register", "SUCCESS", "NULL", enCode);
 
 		return userIdent;
 	}
