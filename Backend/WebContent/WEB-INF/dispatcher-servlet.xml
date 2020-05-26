@@ -10,7 +10,7 @@
 
     <!-- Enables the Spring MVC @Controller programming model -->
     <mvc:annotation-driven/>
-    <context:component-scan base-package="com.mdv.controllers, com.mdv.services, com.mdv.repository, com.mdv.exceptions" />
+    <context:component-scan base-package="com.mdv.controllers, com.mdv.services, com.mdv.repository, com.mdv.exceptions, com.mdv.clients" />
     <context:annotation-config/>
     
 	<bean name="dataSource"

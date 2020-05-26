@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mdv.clients.GovClient;
 import com.mdv.exceptions.NoActionFoundException;
 import com.mdv.exceptions.UserAlreadyFoundException;
 import com.mdv.exceptions.UserMultipleRecordsException;
@@ -23,6 +24,9 @@ public class UserServicesImpl implements UserService {
 	@Autowired
 	private UserServiceJDBCTemplate userJDBC;
 
+	@Autowired
+	private GovClient govClient;
+
 	private static Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Override
@@ -30,14 +34,13 @@ public class UserServicesImpl implements UserService {
 		log.info("User creation for user firstName: " + user.getFirstName() + ", name : " + user.getName());
 
 		// Check if user is a real person - present in Gov DB
-		// TODO
+		String response = govClient.sendGetUser(user);
 
 		// Check if user already registered - present in MDV DB
 		userJDBC.findByIdCard(user.getNationalCardId());
 
-		UserIdentifier userIdent = new UserIdentifierImpl();
-
 		// Generate user identifier and password before store in DB
+		UserIdentifier userIdent = new UserIdentifierImpl();
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
 		userIdent.setId(idGen);
