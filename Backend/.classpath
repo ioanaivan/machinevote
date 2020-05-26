@@ -40,8 +40,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	
-
-	<classpathentry kind="lib" path="C:/Users/Win 7/Desktop/Java/spring-web-5.2.3.RELEASE.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
