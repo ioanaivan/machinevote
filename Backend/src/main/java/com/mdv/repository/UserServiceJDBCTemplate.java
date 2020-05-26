@@ -69,14 +69,15 @@ public class UserServiceJDBCTemplate {
 	// retrieve data corresponding to IdCard and Secu
 	public void findByIdentifier(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException {
-		log.info("JDBC call for user authentification ID and code ");
+		log.info("JDBC call for user authentification ID and code " + userIdentifier.getCode() + " "
+				+ userIdentifier.getId());
 
 		try {
 			jdbcTemplate.queryForObject("SELECT 1 FROM electeur WHERE code = ? AND idElecteur = ?",
 					new Object[] { userIdentifier.getCode(), userIdentifier.getId() }, Integer.class);
 
 		} catch (EmptyResultDataAccessException e) {
-			log.info("Login failed. Pleasetry again.");
+			log.info("Login failed. Please try again.");
 			saveAction("Authenticate", "FAILED", "User not found.", userIdentifier.getId());
 			throw new UserNotFoundException("User not found. Please register.");
 		} catch (IncorrectResultSizeDataAccessException ex) {

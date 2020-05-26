@@ -11,7 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.mdv.model.User;
 import com.mdv.model.UserDocuments;
 
@@ -20,13 +22,13 @@ public class GovClient {
 
 	private static Logger log = LoggerFactory.getLogger(GovClient.class);
 
-	private String url = "http://10.8.0.1:4000";
+	private String url = "http://127.0.0.1:4000";
 	private RestTemplate restReq;
 	private HttpHeaders httpHeaders;
 
 	public GovClient() {
 		this.restReq = new RestTemplate();
-		this.url = "http://10.8.0.1:4000/electeur-authentication";
+		this.url = "http://127.0.0.1:4000/electeur-authentication";
 		this.httpHeaders = new HttpHeaders();
 		this.httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 	}
@@ -36,6 +38,8 @@ public class GovClient {
 		UserDocuments userDoc = new UserDocuments(user.getNationalCardId(), user.getSecurityCardId());
 
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+
 		String userDocJson = "";
 		try {
 			userDocJson = objectMapper.writeValueAsString(userDoc);

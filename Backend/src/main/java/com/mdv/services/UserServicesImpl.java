@@ -44,20 +44,27 @@ public class UserServicesImpl implements UserService {
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
 
-		// Test the encryption method
+		log.info("Generated code: " + codeGen);
+
+		// Encrypt code
 		String enCode = userIdent.encryptCode(codeGen);
+		log.info("Encoded: " + enCode);
 
-		// Test the decryption method
-		String deCode = userIdent.decryptCode(enCode);
-
-		// Create the user with encrypted code
+		// Encrypt user code to save in DB
 		userIdent.setId(idGen);
 		userIdent.setCode(enCode);
 
 		userJDBC.createUser(user, userIdent);
 
 		// Sucessful registration
-		userJDBC.saveAction("Register", "SUCCESS", "NULL", enCode);
+		userJDBC.saveAction("Register", "SUCCESS", "NULL", idGen);
+
+		// Decrypt code to send to user
+		String deCode = userIdent.decryptCode(enCode);
+		userIdent.setCode(deCode);
+
+		// re-encrypt for testing
+		// log.info("Re-encypted: " + userIdent.encryptCode(deCode));
 
 		return userIdent;
 	}
@@ -66,6 +73,12 @@ public class UserServicesImpl implements UserService {
 	public void authUser(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException {
 		log.info("User authentification for user id: " + userIdentifier.getId());
+
+		// Encrypt user code to check in DB
+		String code = userIdentifier.getCode();
+		String encryptedCode = userIdentifier.encryptCode(code);
+		userIdentifier.setCode(encryptedCode);
+
 		userJDBC.findByIdentifier(userIdentifier);
 
 		// Check authentication condition : successful registration
@@ -75,7 +88,7 @@ public class UserServicesImpl implements UserService {
 			// Successful authentication
 			userJDBC.saveAction("Authenticate", "SUCCESS", "NULL", userIdentifier.getId());
 		} else {
-			log.info("No  registration found for user: " + userIdentifier.getId());
+			log.info("No registration found for user: " + userIdentifier.getId());
 			userJDBC.saveAction("Authenticate", "FAILED", "No registration found.", userIdentifier.getId());
 			throw new NoActionFoundException("User not registered. Please register first.");
 		}
