@@ -33,33 +33,33 @@ public class UserServicesImpl implements UserService {
 	public UserIdentifier createUser(User user) throws UserAlreadyFoundException, UserMultipleRecordsException {
 		log.info("User creation for user firstName: " + user.getFirstName() + ", name : " + user.getName());
 
-		// Check if user is a real person - present in Gov DB
+		// Vérifier que l'utilisateur est une personne qui existe dans Gov DB
 		String response = govClient.sendGetUser(user);
 
-		// Check if user already registered - present in MDV DB
+		// Vérifier que l'utilisateur est enregistré dans MDV DB
 		userJDBC.findByIdCard(user.getNationalCardId());
 
-		// Generate user identifier and password before store in DB
+		// Générer un identificateur et un code avant de stocker dans la base de données
 		UserIdentifier userIdent = new UserIdentifierImpl();
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
 
 		log.info("Generated code: " + codeGen);
 
-		// Encrypt code
+		// Crypter le code
 		String enCode = userIdent.encryptCode(codeGen);
 		log.info("Encoded: " + enCode);
 
-		// Encrypt user code to save in DB
+		// Stocker l'identificateur et le code crypté dans la base de donnée
 		userIdent.setId(idGen);
 		userIdent.setCode(enCode);
 
 		userJDBC.createUser(user, userIdent);
 
-		// Sucessful registration
+		// Enregistrement avec succès
 		userJDBC.saveAction("Register", "SUCCESS", "NULL", idGen);
 
-		// Decrypt code to send to user
+		// Décrypter le code pour l'envoyer à l'utilisateur
 		String deCode = userIdent.decryptCode(enCode);
 		userIdent.setCode(deCode);
 

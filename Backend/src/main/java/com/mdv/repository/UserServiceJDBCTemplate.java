@@ -33,6 +33,8 @@ public class UserServiceJDBCTemplate {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	// Ajouter l'utilisateur crée avec ses coordonnées, son identificateur et son
+	// code générés à la base de données
 	public User createUser(User newUser, UserIdentifier userIdent) {
 		log.info("JDBC call for user creation for user: firstname: " + newUser.getFirstName() + ", name: "
 				+ newUser.getName() + ", location: " + newUser.getLocation());
@@ -45,14 +47,17 @@ public class UserServiceJDBCTemplate {
 		return newUser;
 	}
 
+	// Chercher un utilisateur par son numéro de carte d'identité
 	public void findByIdCard(String card) throws UserAlreadyFoundException, UserMultipleRecordsException {
 		log.info("JDBC call for user verification ID: " + card);
 
 		String carte = "";
+		// Créer une requête en utilisant le numéro de carte d'identité envoyé
 		String sql = "SELECT CarteID FROM electeur WHERE CarteID = ?";
 		try {
+			// Chercher l'utilisateur correspondant
 			carte = jdbcTemplate.queryForObject(sql, new Object[] { card }, String.class);
-
+			// Si l'utilisateur existe alors lancer une exception
 			if (!carte.isEmpty()) {
 				log.info("User already registered for card: " + card);
 				throw new UserAlreadyFoundException("User already registered.");
