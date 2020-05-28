@@ -32,6 +32,8 @@ public class UserRESTController {
 
 	private Logger log = LoggerFactory.getLogger(UserRESTController.class);
 
+	// Créer l'utilisateur avec les donnés reçues à savoir Prénom, Nom, Commune,
+	// Numéro de carte d'identité, Numéro de sécurité sociale
 	@CrossOrigin
 	@PostMapping("/createUser")
 	UserIdentifier createUser(@RequestBody User user)
