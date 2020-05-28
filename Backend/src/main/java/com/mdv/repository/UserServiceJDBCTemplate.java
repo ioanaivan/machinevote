@@ -61,7 +61,7 @@ public class UserServiceJDBCTemplate {
 			log.info("User not found in DB, can be created");
 		} catch (IncorrectResultSizeDataAccessException ex) {
 			log.info("User already registered");
-			saveAction("Register", "FAILED", "User already registered. Multiple records found.", "0");
+			saveAction("Register", "FAILED", "User already registered. Multiple records found.", null);
 			throw new UserMultipleRecordsException("User already registered. Multiple records found.");
 		}
 	}
@@ -77,12 +77,31 @@ public class UserServiceJDBCTemplate {
 					new Object[] { userIdentifier.getCode(), userIdentifier.getId() }, Integer.class);
 
 		} catch (EmptyResultDataAccessException e) {
-			log.info("Login failed. Please try again.");
+			log.info("Login failed.");
 			saveAction("Authenticate", "FAILED", "User not found.", userIdentifier.getId());
 			throw new UserNotFoundException("User not found. Please register.");
 		} catch (IncorrectResultSizeDataAccessException ex) {
 			log.info("Multiple users found.");
 			saveAction("Authenticate", "FAILED", "Multiple users found.", userIdentifier.getId());
+			throw new UserMultipleRecordsException("Multiple records found");
+		}
+	}
+
+	// search by id
+	public String findById(String id) throws UserNotFoundException, UserMultipleRecordsException {
+		log.info("JDBC call for user authentification ID " + id);
+
+		try {
+			return jdbcTemplate.queryForObject("SELECT code FROM electeur WHERE idElecteur = ?", new Object[] { id },
+					String.class);
+
+		} catch (EmptyResultDataAccessException e) {
+			log.info("User not found. Please register first.");
+			saveAction("Authenticate", "FAILED", "User not found.", id);
+			throw new UserNotFoundException("User not found. Please register.");
+		} catch (IncorrectResultSizeDataAccessException ex) {
+			log.info("Multiple users found.");
+			saveAction("Authenticate", "FAILED", "Multiple users found.", id);
 			throw new UserMultipleRecordsException("Multiple records found");
 		}
 	}

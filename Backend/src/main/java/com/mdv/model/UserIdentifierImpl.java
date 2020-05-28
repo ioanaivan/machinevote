@@ -56,17 +56,18 @@ public class UserIdentifierImpl implements UserIdentifier {
 	}
 
 	public String encryptCode(String code) {
-		textEncryptor.setPassword(code);
+		textEncryptor.setPassword("machinedevote");
 		String enCode = textEncryptor.encrypt(code);
 		return enCode;
 	}
 
 	public String decryptCode(String code) {
+		textEncryptor.setPassword("machinedevote");
 		String deCode = textEncryptor.decrypt(code);
 		return deCode;
 	}
 
-	// TODO draft method - move to another class
+	// Generate password
 	public String generatePassayCode() {
 		PasswordGenerator gen = new PasswordGenerator();
 		CharacterData lowerCaseChars = EnglishCharacterData.LowerCase;
@@ -97,7 +98,7 @@ public class UserIdentifierImpl implements UserIdentifier {
 		return password;
 	}
 
-	// TODO generate a shorter id ?
+	// Generate Unique user Id
 	public String generateId() {
 		this.setId(UUID.randomUUID().toString());
 		log.info("Id generated for user: " + this.getId());

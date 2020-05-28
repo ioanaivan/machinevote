@@ -15,7 +15,8 @@ import com.mdv.model.VoteIdentifier;
 
 public interface UserService {
 
-	public UserIdentifier createUser(User user) throws UserAlreadyFoundException, UserMultipleRecordsException;
+	public UserIdentifier createUser(User user)
+			throws UserAlreadyFoundException, UserMultipleRecordsException, UserNotFoundException;
 
 	public void authUser(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException;

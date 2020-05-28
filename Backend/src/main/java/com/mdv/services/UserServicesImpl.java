@@ -30,13 +30,21 @@ public class UserServicesImpl implements UserService {
 	private static Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Override
-	public UserIdentifier createUser(User user) throws UserAlreadyFoundException, UserMultipleRecordsException {
+	public UserIdentifier createUser(User user)
+			throws UserAlreadyFoundException, UserMultipleRecordsException, UserNotFoundException {
 		log.info("User creation for user firstName: " + user.getFirstName() + ", name : " + user.getName());
 
 		// Check if user is a real person - present in Gov DB
 		String response = govClient.sendGetUser(user);
 
-		// Check if user already registered - present in MDV DB
+		if (response != null && !response.isEmpty() && !response.equals("User found")) {
+			log.info("User creation FAILED for user firstName: " + user.getFirstName() + ", name : " + user.getName()
+					+ " with error: " + response);
+			userJDBC.saveAction("Register", "FAILED", response, null);
+			throw new UserNotFoundException(response);
+		}
+
+		// Check if user already registered - present in DB
 		userJDBC.findByIdCard(user.getNationalCardId());
 
 		// Generate user identifier and password before store in DB
@@ -44,27 +52,19 @@ public class UserServicesImpl implements UserService {
 		String idGen = userIdent.generateId();
 		String codeGen = userIdent.generateCode();
 
-		log.info("Generated code: " + codeGen);
-
-		// Encrypt code
+		// Set data for DB save with encrypted pass
 		String enCode = userIdent.encryptCode(codeGen);
-		log.info("Encoded: " + enCode);
-
-		// Encrypt user code to save in DB
 		userIdent.setId(idGen);
 		userIdent.setCode(enCode);
 
+		// Create user in DB
 		userJDBC.createUser(user, userIdent);
 
-		// Sucessful registration
+		// Successful registration
 		userJDBC.saveAction("Register", "SUCCESS", "NULL", idGen);
 
-		// Decrypt code to send to user
-		String deCode = userIdent.decryptCode(enCode);
-		userIdent.setCode(deCode);
-
-		// re-encrypt for testing
-		// log.info("Re-encypted: " + userIdent.encryptCode(deCode));
+		// Set plain code to send back to client
+		userIdent.setCode(codeGen);
 
 		return userIdent;
 	}
@@ -74,15 +74,19 @@ public class UserServicesImpl implements UserService {
 			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException {
 		log.info("User authentification for user id: " + userIdentifier.getId());
 
-		// Encrypt user code to check in DB
-		String code = userIdentifier.getCode();
-		String encryptedCode = userIdentifier.encryptCode(code);
-		userIdentifier.setCode(encryptedCode);
+		// Search user code by id
+		String codeDB = userJDBC.findById(userIdentifier.getId());
 
-		userJDBC.findByIdentifier(userIdentifier);
+		String decryptedCodeDB = userIdentifier.decryptCode(codeDB);
+
+		// Check authentication condition : code match avec db code
+		if (!decryptedCodeDB.equals(userIdentifier.getCode())) {
+			log.info("Code doesn't match. Login failed.");
+			userJDBC.saveAction("Authenticate", "FAILED", "Code doesn't match.", userIdentifier.getId());
+			throw new UserNotFoundException("User not found. Please register.");
+		}
 
 		// Check authentication condition : successful registration
-
 		if (!userJDBC.getAction(userIdentifier.getId(), "Register", "SUCCESS").equals("")) {
 
 			// Successful authentication

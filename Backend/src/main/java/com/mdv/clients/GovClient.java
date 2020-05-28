@@ -1,5 +1,7 @@
 package com.mdv.clients;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -10,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.ResourceAccessException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.mdv.model.User;
@@ -22,7 +23,7 @@ public class GovClient {
 
 	private static Logger log = LoggerFactory.getLogger(GovClient.class);
 
-	private String url = "http://127.0.0.1:4000";
+	private String url = "";
 	private RestTemplate restReq;
 	private HttpHeaders httpHeaders;
 
@@ -40,22 +41,32 @@ public class GovClient {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
 
-		String userDocJson = "";
+		String userGetRequestJson = "";
+		String userGetResponseJson = "";
+		String responseText = "";
 		try {
-			userDocJson = objectMapper.writeValueAsString(userDoc);
-		} catch (JsonProcessingException e) {
+			userGetRequestJson = objectMapper.writeValueAsString(userDoc);
+
+			log.info("Call gov sendGetUser() request: " + userGetRequestJson);
+			HttpEntity<String> requestEntity = new HttpEntity<String>(userGetRequestJson.toString(), httpHeaders);
+
+			// Send request to client
+			ResponseEntity<String> responseEntity = restReq.postForEntity(url, requestEntity, String.class);
+
+			userGetResponseJson = responseEntity.getBody();
+			JsonNode response = objectMapper.readTree(userGetResponseJson);
+			responseText = response.get("message").asText();
+
+			log.info("Call gov sendGetUser() status: " + responseEntity.getStatusCode() + " reponse: " + responseText);
+
+		} catch (IOException ioe) {
 			// Treat as successful but print the log
-			e.printStackTrace();
+			ioe.printStackTrace();
 		} catch (ResourceAccessException ce) {
 			// Treat as successful but print the log
 			ce.printStackTrace();
 		}
-		log.info("Call gov sendGetUser() request: " + userDocJson);
-		HttpEntity<String> requestEntity = new HttpEntity<String>(userDocJson.toString(), httpHeaders);
 
-		ResponseEntity<String> responseEntity = restReq.postForEntity(url, requestEntity, String.class);
-		log.info("Call gov sendGetUser() status: " + responseEntity.getStatusCode() + " reponse: "
-				+ responseEntity.getBody());
-		return responseEntity.getBody();
+		return responseText;
 	}
 }

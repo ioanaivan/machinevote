@@ -34,7 +34,8 @@ public class UserRESTController {
 
 	@CrossOrigin
 	@PostMapping("/createUser")
-	UserIdentifier createUser(@RequestBody User user) throws UserAlreadyFoundException, UserMultipleRecordsException {
+	UserIdentifier createUser(@RequestBody User user)
+			throws UserAlreadyFoundException, UserMultipleRecordsException, UserNotFoundException {
 		log.info("POST Request to /createUser received with data : " + "firstName: " + user.getFirstName() + " name: "
 				+ user.getName() + " location: " + user.getLocation() + " nationalcardId: " + user.getNationalCardId()
 				+ " securityCardId: " + user.getSecurityCardId());
