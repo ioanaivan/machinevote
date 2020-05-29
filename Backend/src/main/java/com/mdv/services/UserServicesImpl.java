@@ -36,6 +36,7 @@ public class UserServicesImpl implements UserService {
 
 		// Check if user is a real person - present in Gov DB
 		String response = govClient.sendGetUser(user);
+
 		if (response != null && !response.isEmpty() && !response.equals("User found")) {
 			log.info("User creation FAILED for user firstName: " + user.getFirstName() + ", name : " + user.getName()
 					+ " with error: " + response);
