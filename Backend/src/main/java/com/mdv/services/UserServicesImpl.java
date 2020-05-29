@@ -104,9 +104,11 @@ public class UserServicesImpl implements UserService {
 
 		// Check vote conditions: successful authentication and no previous vote present
 		if (userJDBC.getAction(voteIdentifier.getId(), "Authenticate", "SUCCESS").equals("")) {
+			userJDBC.saveAction("Vote", "FAILED", "No authentification found.", voteIdentifier.getId());
 			throw new NoActionFoundException("User not authenticated. Please authenticate first.");
 		} else {
 			if (!userJDBC.getAction(voteIdentifier.getId(), "Vote", "SUCCESS").equals("")) {
+				userJDBC.saveAction("Vote", "FAILED", "Already voted.", voteIdentifier.getId());
 				throw new VoteAlreadyFoundException(
 						"You have already voted. To log a complain, please call customer support.");
 			} else {
