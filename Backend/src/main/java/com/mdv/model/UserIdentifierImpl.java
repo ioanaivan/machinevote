@@ -55,14 +55,12 @@ public class UserIdentifierImpl implements UserIdentifier {
 		return this.getCode();
 	}
 
-	// Crypter le code généré pour un utilisateur
 	public String encryptCode(String code) {
 		textEncryptor.setPassword("machinedevote");
 		String enCode = textEncryptor.encrypt(code);
 		return enCode;
 	}
 
-	// Décrypter le code
 	public String decryptCode(String code) {
 		textEncryptor.setPassword("machinedevote");
 		String deCode = textEncryptor.decrypt(code);
