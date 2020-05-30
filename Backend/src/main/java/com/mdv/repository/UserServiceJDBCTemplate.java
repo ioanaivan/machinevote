@@ -1,7 +1,7 @@
-/*
- * Class in charge of 
+/**
+ * @package com.mdv.repository
+ * @brief Connections to database
  */
-
 package com.mdv.repository;
 
 import org.springframework.stereotype.Repository;
@@ -20,19 +20,47 @@ import com.mdv.exceptions.UserMultipleRecordsException;
 import com.mdv.exceptions.UserNotFoundException;
 import com.mdv.model.*;
 
+/**
+ * @brief Class to model the vote identifier
+ * 
+ * @author Ioana Ivan
+ * @date 29/05/2020
+ */
 @Transactional
 @Repository
 public class UserServiceJDBCTemplate {
-
+	/**
+	 * @brief Logger
+	 */
 	private Logger log = LoggerFactory.getLogger(UserServiceJDBCTemplate.class);
 
+	/**
+	 * @brief Template for Jdbc queries
+	 */
 	JdbcTemplate jdbcTemplate;
 
+	/**
+	 * @brief Setter for datasource in jdbctemplate
+	 * @param DataSource the connection parameters to the database
+	 * @return void
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	/**
+	 * @brief Call DB for inserting user
+	 * @param User           the user to be created
+	 * @param UserIdentifier the identifiers for the user
+	 * @return User
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public User createUser(User newUser, UserIdentifier userIdent) {
 		log.info("JDBC call for user creation for user: firstname: " + newUser.getFirstName() + ", name: "
 				+ newUser.getName() + ", location: " + newUser.getLocation());
@@ -45,6 +73,18 @@ public class UserServiceJDBCTemplate {
 		return newUser;
 	}
 
+	/**
+	 * @brief Call DB for searching user by ID card
+	 * @param String the national card ID
+	 * @exception UserAlreadyFoundException    if user already found in database
+	 * @exception UserMultipleRecordsException if multiple users found in database
+	 * @return void
+	 * 
+	 * 
+	 * @author Sara Jabert
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public void findByIdCard(String card) throws UserAlreadyFoundException, UserMultipleRecordsException {
 		log.info("JDBC call for user verification ID: " + card);
 
@@ -66,7 +106,50 @@ public class UserServiceJDBCTemplate {
 		}
 	}
 
-	// retrieve data corresponding to IdCard and Secu
+	/**
+	 * @brief Call DB for searching user by security card ID
+	 * @param String the security card ID
+	 * @exception UserAlreadyFoundException    if user already found in database
+	 * @exception UserMultipleRecordsException if multiple users found in database
+	 * @return void
+	 * 
+	 * 
+	 * @author Ioana Ivan
+	 * @date 30/05/2020
+	 */
+	public void findBySecuCard(String secu) throws UserAlreadyFoundException, UserMultipleRecordsException {
+		log.info("JDBC call for user verification security ID: " + secu);
+
+		String secuID = "";
+		String sql = "SELECT SecuID FROM electeur WHERE SecuID = ?";
+		try {
+			secuID = jdbcTemplate.queryForObject(sql, new Object[] { secu }, String.class);
+
+			if (!secuID.isEmpty()) {
+				log.info("User already registered for security card: " + secu);
+				throw new UserAlreadyFoundException("User already registered.");
+			}
+		} catch (EmptyResultDataAccessException e) {
+			log.info("User not found in DB, can be created");
+		} catch (IncorrectResultSizeDataAccessException ex) {
+			log.info("User already registered");
+			saveAction("Register", "FAILED", "User already registered. Multiple records found.", null);
+			throw new UserMultipleRecordsException("User already registered. Multiple records found.");
+		}
+	}
+
+	/**
+	 * @brief Call DB for searching user by User identifiers
+	 * @param UserIdentifier the user's identifiers
+	 * @exception UserNotFoundException        if user identifiers not found in
+	 *                                         database
+	 * @exception UserMultipleRecordsException if multiple users identifiers found
+	 *                                         in database
+	 * @return void
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public void findByIdentifier(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException {
 		log.info("JDBC call for user authentification ID and code " + userIdentifier.getCode() + " "
@@ -87,7 +170,18 @@ public class UserServiceJDBCTemplate {
 		}
 	}
 
-	// search by id
+	/**
+	 * @brief Call DB for searching user by user unique identifier
+	 * @param String the user's unique id
+	 * @return void
+	 * @exception UserNotFoundException        if user identifier not found in
+	 *                                         database
+	 * @exception UserMultipleRecordsException if multiple users identifiers found
+	 *                                         in database
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public String findById(String id) throws UserNotFoundException, UserMultipleRecordsException {
 		log.info("JDBC call for user authentification ID " + id);
 
@@ -106,8 +200,19 @@ public class UserServiceJDBCTemplate {
 		}
 	}
 
-	public String getAction(String userId, String action, String type)
-			throws NoActionFoundException, UserMultipleRecordsException {
+	/**
+	 * @brief Call DB for searching a specific action made by the user
+	 * @param String the user's id
+	 * @param String the action performed (Registrer, Authenticate, Vote)
+	 * @param String (SUCCESS, FAILED)
+	 * 
+	 * @exception NoActionFoundException if user identifier not found in database
+	 * @return void
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
+	public String getAction(String userId, String action, String type) throws NoActionFoundException {
 		log.info("JDBC call for checking status for action: " + action + ", for userId: " + userId);
 		String actionId = "";
 		try {
@@ -117,12 +222,19 @@ public class UserServiceJDBCTemplate {
 
 		} catch (EmptyResultDataAccessException e) {
 			log.info("No records returned for  " + action + " first. " + userId);
-		} catch (IncorrectResultSizeDataAccessException ex) {
-			log.info("Multiple " + action + "s found for this user.");
 		}
+
 		return actionId;
 	}
 
+	/**
+	 * @brief Call DB for inserting vote in database
+	 * @param VoteIdentifier the vote's identifier
+	 * @return void
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public void createVote(VoteIdentifier voteIdentifier) {
 		log.info("JDBC call for vote for ID: " + voteIdentifier.getId());
 
@@ -130,6 +242,17 @@ public class UserServiceJDBCTemplate {
 				new Object[] { voteIdentifier.getId(), voteIdentifier.getVoteOption() });
 	}
 
+	/**
+	 * @brief Call DB for inserting a specific action in the DB
+	 * @param String  (Registrer, Authenticate, Vote)
+	 * @param String  (SUCCESS, FAILED)
+	 * @param String  the error message
+	 * @param Strings the user's unique identifier
+	 * @return void
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	public void saveAction(String type, String status, String error, String voterid) {
 		log.info("JDBC call for registering action: " + type + ", intiated by: " + voterid);
 

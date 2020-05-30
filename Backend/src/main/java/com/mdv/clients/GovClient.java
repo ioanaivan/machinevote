@@ -1,6 +1,8 @@
+/**
+ * @package com.mdv.clients
+ * @brief Clients for calling other applications
+ */
 package com.mdv.clients;
-
-import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,22 +13,46 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.ResourceAccessException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.mdv.model.User;
 import com.mdv.model.UserDocuments;
+import java.io.IOException;
 
+/**
+ * 
+ * @brief Class to represent the simulator for the government solution
+ * 
+ * @author Ioana Ivan
+ * @date 29/05/2020
+ */
 @Service
 public class GovClient {
 
+	/**
+	 * @brief Logger for the GovClient class
+	 */
 	private static Logger log = LoggerFactory.getLogger(GovClient.class);
 
+	/**
+	 * @brief Url to call the Government server
+	 */
 	private String url = "";
+
+	/**
+	 * @brief Synchronous client to perform HTTP requests
+	 */
 	private RestTemplate restReq;
+
+	/**
+	 * @brief Headers for the request
+	 */
 	private HttpHeaders httpHeaders;
 
+	/**
+	 * @brief Constructor
+	 */
 	public GovClient() {
 		this.restReq = new RestTemplate();
 		this.url = "http://127.0.0.1:4000/electeur-authentication";
@@ -34,6 +60,15 @@ public class GovClient {
 		this.httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 	}
 
+	/**
+	 * @brief Sends the Http request to check user data is present in Gov server
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 * 
+	 * @param String the user to be searched
+	 * @return <b>String</b> the response body from the Http response received
+	 */
 	public String sendGetUser(User user) {
 		log.info("Call gov sendGetUser() for user: " + user.getName());
 		UserDocuments userDoc = new UserDocuments(user.getNationalCardId(), user.getSecurityCardId());

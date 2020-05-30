@@ -1,7 +1,3 @@
-/*
- * Class containing services used for processing
- */
-
 package com.mdv.services;
 
 import org.slf4j.Logger;
@@ -18,17 +14,46 @@ import com.mdv.exceptions.VoteAlreadyFoundException;
 import com.mdv.model.*;
 import com.mdv.repository.*;
 
+/**
+ * @brief Implementation for user services
+ * 
+ * @author Ioana Ivan
+ * @date 29/05/2020
+ */
 @Service
 public class UserServicesImpl implements UserService {
 
+	/**
+	 * @brief Template for database queries
+	 */
 	@Autowired
 	private UserServiceJDBCTemplate userJDBC;
 
+	/**
+	 * @brief Client to government solution
+	 */
 	@Autowired
 	private GovClient govClient;
 
+	/**
+	 * @brief Logger
+	 */
 	private static Logger log = LoggerFactory.getLogger(UserService.class);
 
+	/**
+	 * @brief create user service
+	 * @param User user's data
+	 * @return <b>UserIdentifier</b> user's identifiers generated
+	 * @exception UserAlreadyFoundException    if user has already registered with
+	 *                                         that idCard
+	 * @exception UserMultipleRecordsException if multiple records for this user
+	 *                                         already exist <b>fraud case</b>
+	 * @exception UserNotFoundException        if user is not found in the
+	 *                                         government database
+	 * 
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	@Override
 	public UserIdentifier createUser(User user)
 			throws UserAlreadyFoundException, UserMultipleRecordsException, UserNotFoundException {
@@ -44,8 +69,11 @@ public class UserServicesImpl implements UserService {
 			throw new UserNotFoundException(response);
 		}
 
-		// Check if user already registered - present in DB
+		// Check if user already registered with that ID card
 		userJDBC.findByIdCard(user.getNationalCardId());
+
+		// Check if user already registered with that secu ID card
+		userJDBC.findBySecuCard(user.getSecurityCardId());
 
 		// Generate user identifier and password before store in DB
 		UserIdentifier userIdent = new UserIdentifierImpl();
@@ -69,6 +97,20 @@ public class UserServicesImpl implements UserService {
 		return userIdent;
 	}
 
+	/**
+	 * @brief authorize user service
+	 * @param UserIdentifier user's identifiers
+	 * @return void
+	 * @exception UserNotFoundException        if no user is found for the provided
+	 *                                         identifiers
+	 * @exception UserMultipleRecordsException if multiple registration actions for
+	 *                                         this user already exist <b>fraud
+	 *                                         case</b>
+	 * @exception NoActionFoundException       if no registration action is found
+	 *                                         for the user
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	@Override
 	public void authUser(UserIdentifier userIdentifier)
 			throws UserNotFoundException, UserMultipleRecordsException, NoActionFoundException {
@@ -98,9 +140,19 @@ public class UserServicesImpl implements UserService {
 		}
 	}
 
+	/**
+	 * @brief create vote service
+	 * @param VoteIdentifier vote data
+	 * @return void
+	 * @exception VoteAlreadyFoundException if a vote is already found for this user
+	 * 
+	 * @exception NoActionFoundException    if no authentication action is found for
+	 *                                      the user
+	 * @author Ioana Ivan
+	 * @date 29/05/2020
+	 */
 	@Override
-	public void createVote(VoteIdentifier voteIdentifier)
-			throws NoActionFoundException, UserMultipleRecordsException, VoteAlreadyFoundException {
+	public void createVote(VoteIdentifier voteIdentifier) throws NoActionFoundException, VoteAlreadyFoundException {
 		log.info("Voting for user id: " + voteIdentifier.getId());
 
 		// Check vote conditions: successful authentication and no previous vote present

@@ -5,7 +5,7 @@ CREATE TABLE `electeur` (
 	`Commune` VARCHAR(45) NOT NULL,
 	`CarteID` VARCHAR(45) NOT NULL,
 	`SecuID` VARCHAR(45) NOT NULL,
-	`Code` VARCHAR(20) NOT NULL,
+	`Code` VARCHAR(200) NOT NULL,
 	`CreatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`idElecteur`),
 	INDEX `Code` (`Code`)
@@ -15,15 +15,20 @@ ENGINE=InnoDB
 ;
 
 CREATE TABLE `actions` (
-  `idActions` varchar(40) NOT NULL,
-  `Type` varchar(40),
-  `Statut` varchar(40),
-  `Erreur` set('Identifiants incorrects','Vote complété avec succès'),
-  `idElecteur`varchar(40) NOT NULL,
-  `SecuID` varchar(40),
-  PRIMARY KEY (`idActions`),
-  CONSTRAINT `idElecteur` FOREIGN KEY (`idElecteur`) REFERENCES `electeur` (`idElecteur`),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	`idAction` INT(11) NOT NULL AUTO_INCREMENT,
+	`Type` VARCHAR(45) NULL DEFAULT NULL,
+	`Statut` VARCHAR(45) NULL DEFAULT NULL,
+	`Erreur` VARCHAR(100) NULL DEFAULT NULL,
+	`idElecteur` VARCHAR(200) NULL DEFAULT NULL,
+	`actionDate` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`idAction`),
+	INDEX `FK_idElecteur` (`idElecteur`)
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=167
+;
+
 
 CREATE TABLE `vote` (
 	`voteId` INT(11) NOT NULL AUTO_INCREMENT,
@@ -36,5 +41,6 @@ CREATE TABLE `vote` (
 )
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=15
+AUTO_INCREMENT=24
 ;
+
